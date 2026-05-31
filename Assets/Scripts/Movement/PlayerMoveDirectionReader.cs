@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class GetPlayerMoveDirection : MonoBehaviour, IGetMoveDirection
+[RequireComponent(typeof(Transform))]
+public class PlayerMoveDirectionReader : MonoBehaviour, IReadPlayerMoveDirection
 {
     [SerializeField]
     InputActionReference moveAction;
@@ -19,13 +20,13 @@ public class GetPlayerMoveDirection : MonoBehaviour, IGetMoveDirection
     {
         if ( moveAction == null)
         {
-            Debug.LogError("No Move action finded");
+            Debug.LogError("No Move action found");
         }
     }
 
     public Vector3 GetMoveDirection()
     {
-        if (moveAction == null) return Vector2.zero;
+        if (moveAction == null) return Vector3.zero;
 
         Vector2 input = moveAction.action.ReadValue<Vector2>();
         
@@ -34,6 +35,6 @@ public class GetPlayerMoveDirection : MonoBehaviour, IGetMoveDirection
             input.Normalize();
         }
 
-        return (input.x * transform.right) + (input.y * transform.forward);
+        return new Vector3(input.x, 0f, input.y);
     }
 }

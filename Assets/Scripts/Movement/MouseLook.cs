@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Transform))]
 public class MouseLook : MonoBehaviour
 {
     [Header("Configuration")]

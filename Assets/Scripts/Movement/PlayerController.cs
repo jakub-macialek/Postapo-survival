@@ -3,14 +3,15 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] Rigidbody playerRigidbody;
+    [SerializeField] Transform playerTransform;
     IMove movement;
-    IGetMoveDirection direction;
+    IReadPlayerMoveDirection direction;
     ILogger logger;
 
     void Awake()
     {
         movement = GetComponent<IMove>();
-        direction = GetComponent<IGetMoveDirection>();
+        direction = GetComponent<IReadPlayerMoveDirection>();
         logger = GetComponent<ILogger>();
     }
 
@@ -24,6 +25,10 @@ public class PlayerController : MonoBehaviour
         {
             logger.LogError("Rigidbody component is missing on " + gameObject.name);
         }
+        if (playerTransform == null)
+        {
+            logger.LogError("Transform component is missing on " + gameObject.name);
+        }
         if (movement == null)
         {
             logger.LogError("IMove component is missing on " + gameObject.name);
@@ -36,6 +41,6 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        movement.Move(direction.GetMoveDirection(), playerRigidbody);
+        movement.Move(direction.GetMoveDirection(), playerRigidbody, playerTransform);
     }
 }

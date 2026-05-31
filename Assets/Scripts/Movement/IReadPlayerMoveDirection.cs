@@ -1,6 +1,6 @@
 using UnityEngine;
 
-interface IGetMoveDirection
+interface IReadPlayerMoveDirection
 {
     Vector3 GetMoveDirection();
 }
