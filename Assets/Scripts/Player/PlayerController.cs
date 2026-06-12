@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Transform))]
-public class PlayerMovementController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     private float playerSpeed = 5f;
@@ -15,30 +15,37 @@ public class PlayerMovementController : MonoBehaviour
     private Vector3 playerVelocity;
     private bool groundedPlayer;
     [SerializeField]
-    private ILogger logger;
+    Camera playerCamera;
+    [SerializeField]
+    PlayerUI playerUI;
+    [SerializeField]
+    private Logger logger;
 
     [Header("Input Actions")]
     [SerializeField]
     private InputActionReference moveAction;
     [SerializeField]
     private InputActionReference jumpAction;
+    [SerializeField]
+    private InputActionReference interactionAction;
 
     private void OnEnable()
     {
         moveAction.action.Enable();
         jumpAction.action.Enable();
+        interactionAction.action.Enable();
     }
 
     private void OnDisable()
     {
         moveAction.action.Disable();
         jumpAction.action.Disable();
+        interactionAction.action.Disable();
     }
 
     void Awake()
     {
         characterController = GetComponent<CharacterController>();
-        logger = GetComponent<ILogger>();
 
         if (logger == null)
         {
@@ -48,34 +55,49 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Update()
     {
-        groundedPlayer = characterController.isGrounded;
+        HandleMovement();
+        HandleInteraction();
+    }
 
-        if ( groundedPlayer )
+    void HandleInteraction()
+    {
+        Ray ray = playerCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (Physics.Raycast(ray, out RaycastHit hit, 2f))
         {
-            if ( !moveAction.action.enabled )
+            Interactable interactable = hit.collider.GetComponent<Interactable>();
+            if (interactable != null)
             {
-                moveAction.action.Enable();
+                playerUI.ShowCenteredText("Press E to interact with " + interactable.GetName());
+                if (interactionAction.action.WasPressedThisFrame())
+                {
+                    interactable.OnInteraction(gameObject);
+                }
             }
             
         }
         else
         {
-            moveAction.action.Disable();
+            playerUI.HideCenteredText();
         }
+    }
+
+    void HandleMovement()
+    {
+        groundedPlayer = characterController.isGrounded;
 
         Vector2 input = moveAction.action.ReadValue<Vector2>();
 
-        Vector3 move = ( input.x * transform.right ) + ( transform.forward * input.y );
+        Vector3 move = (input.x * transform.right) + (transform.forward * input.y);
         move = Vector3.ClampMagnitude(move, 1f);
-        
-        if( groundedPlayer && jumpAction.action.WasPerformedThisFrame() )
+
+        if (groundedPlayer && jumpAction.action.WasPerformedThisFrame())
         {
             playerVelocity.y = Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
 
-        Vector3 finalMove = ( move * playerSpeed ) + ( Vector3.up * playerVelocity.y );
+        Vector3 finalMove = (move * playerSpeed) + (Vector3.up * playerVelocity.y);
         characterController.Move(finalMove * Time.deltaTime);
     }
 }

@@ -10,7 +10,7 @@ public class MouseController : MonoBehaviour
     [SerializeField]
     private Transform cameraTransform;
     [SerializeField] 
-    private ILogger logger;
+    private Logger logger;
 
     [Header("Input Actions")]
     [SerializeField] InputActionReference lookAction;
@@ -29,7 +29,6 @@ public class MouseController : MonoBehaviour
 
     private void Awake()
     {
-        logger = GetComponent<ILogger>();
         if (logger == null )
         {
             Debug.LogError("MouseController didn't found a component that implements ILogger.");
