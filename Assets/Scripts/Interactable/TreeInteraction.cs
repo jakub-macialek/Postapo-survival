@@ -1,9 +1,13 @@
 using UnityEngine;
 
-public class StoneInteraction : Interactable
+public class TreeInteraction : Interactable
 {
     [SerializeField]
-    private string _name = "Stone";
+    private ItemScriptableObject item;
+    [SerializeField]
+    private GameObject objectToDestroy;
+    [SerializeField]
+    private ushort quantity = 1;
 
     public override void OnInteraction(GameObject player)
     {
@@ -12,8 +16,12 @@ public class StoneInteraction : Interactable
         {
             if (player.TryGetComponent(out PlayerInventory inventory))
             {
-                inventory.AddItem("Stone");
-                Destroy(gameObject);
+                Debug.Log($"Player interacted with {gameObject.name} and is adding {item.itemName} to inventory.");
+                if ( inventory.AddItem(item, quantity) )
+                {
+                    Debug.Log($"{item.itemName} added to inventory. Destroying {gameObject.name}.");
+                    Destroy(objectToDestroy);
+                }
             }
             else
             {
@@ -24,10 +32,5 @@ public class StoneInteraction : Interactable
         {
             Debug.LogError($"An error occurred while interacting with the stone: {ex.Message}");
         }
-    }
-
-    public override string GetName()
-    {
-        return _name;
     }
 }

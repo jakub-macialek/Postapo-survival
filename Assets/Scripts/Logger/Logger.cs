@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Logger : MonoBehaviour, ILogger
 {
+    [SerializeField] string loggerName = "PlayerLogger";
     [SerializeField] bool active = true;
     [SerializeField] Color logColor = Color.white;
     [SerializeField] Color warningColor = Color.yellow;
@@ -10,7 +11,7 @@ public class Logger : MonoBehaviour, ILogger
     public void Log(string message)
     {
         if (!active) return;
-        Debug.Log("<color=#"+logColor.GetHashCode()+">PlayerLoggerLog: "+message);
+        Debug.Log("<color=#"+logColor.GetHashCode()+">" + loggerName + ": "+message);
     }
     public void LogWarning(string message)
     {
